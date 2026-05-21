@@ -48,7 +48,9 @@ OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY", "")
 # =========================
 # 💾 BASE DE DATOS
 # =========================
-MONGO_URI = "mongodb://localhost:27017/"
+# Usar variable de entorno si existe, si no usar local (para desarrollo)
+# En Render, agregar variable de entorno MONGO_URI con la cadena de Atlas
+MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
 MONGO_DB_NAME = "agrovoice"
 MONGO_COLECCION_DATOS = "registros"
 MONGO_COLECCION_CLIMA = "clima_real"
