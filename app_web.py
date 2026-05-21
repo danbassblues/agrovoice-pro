@@ -1,4 +1,4 @@
-# Este es el app_web.py completo y corregido
+# Este es el app_web.py completo y corregido CON DIAGNÓSTICO
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
@@ -8,7 +8,41 @@ import os
 from datetime import datetime
 import random
 
+# ===== DIAGNÓSTICO PARA RENDER =====
+print("=== DIAGNÓSTICO DE ARCHIVOS ===")
+print("Directorio actual:", os.getcwd())
+print("Archivos en directorio:", os.listdir("."))
+print("¿Existe config.py?", os.path.exists("config.py"))
+
+# Buscar config.py en todo el árbol
+for root, dirs, files in os.walk("."):
+    if "config.py" in files:
+        print(f"✅ config.py encontrado en: {root}")
+    if "app_web.py" in files:
+        print(f"✅ app_web.py encontrado en: {root}")
+# =================================
+
+# Asegurar que el directorio actual está en el path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+# Intentar importar config
+try:
+    import config
+    print("✅ config.py importado correctamente")
+    print(f"📦 MONGO_URI desde config: {config.MONGO_URI[:50]}...")
+except Exception as e:
+    print(f"❌ Error importando config: {e}")
+    # Crear config en memoria como fallback
+    class config:
+        MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
+        MONGO_DB_NAME = "agrovoice"
+        MONGO_COLECCION_DATOS = "registros"
+        MONGO_COLECCION_CLIMA = "clima_real"
+        MODEL_PATH = "data/modelo_riego_v2.keras"
+        OPENWEATHER_API_KEY = ""
+        LATITUD = 25.6866
+        LONGITUD = -100.3161
+    print("⚠️ Usando configuración de respaldo")
 
 from src_core.ia_modelo import ModeloRiego
 from src_core.base_datos import GestorBD
@@ -88,6 +122,9 @@ def generar_html(context):
         }}
         .table {{
             background: white;
+        }}
+        .progress-bar {{
+            background-color: #28a745;
         }}
     </style>
 </head>
@@ -203,6 +240,7 @@ def generar_html(context):
 @app.get("/", response_class=HTMLResponse)
 async def dashboard(request: Request):
     try:
+        print("🟢 Iniciando dashboard...")
         bd = GestorBD()
         ia = ModeloRiego()
         ia.cargar_o_crear()
@@ -257,6 +295,8 @@ async def dashboard(request: Request):
         
     except Exception as e:
         print(f"❌ Error general: {e}")
+        import traceback
+        traceback.print_exc()
         return HTMLResponse(content=f"""
         <html>
             <body>
