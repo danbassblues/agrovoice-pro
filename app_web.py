@@ -49,10 +49,10 @@ def generar_html(context):
     for reg in context['historial'][:10]:
         filas_tabla += f"""
         <tr>
-            <td>{reg.get('fecha', 'N/A')}</td>
-            <td>{reg.get('humedad_suelo', 'N/A')}%</td>
-            <td>{reg.get('temperatura', 'N/A')}°C</td>
-            <td>{reg.get('decision', 'N/A')}</td>
+            <td>{reg.get('fecha', 'N/A')} None
+            <td>{reg.get('humedad_suelo', 'N/A')}% None
+            <td>{reg.get('temperatura', 'N/A')}°C None
+            <td>{reg.get('decision', 'N/A')} None
         </tr>
         """
     
@@ -310,60 +310,26 @@ def generar_html(context):
     <script>
         // ========== FUNCIONES DE VOZ ==========
         const synthesis = window.speechSynthesis;
-        let vocesCargadas = false;
-        
-        // Esperar a que las voces estén disponibles
-        if (synthesis) {
-            if (synthesis.onvoiceschanged !== undefined) {
-                synthesis.onvoiceschanged = () => {{ vocesCargadas = true; }};
-            } else {{
-                vocesCargadas = true;
-            }}
-        }
         
         function hablar(texto) {{
             if (!synthesis) {{
-                console.log("⚠️ Web Speech API no soportada en este navegador");
+                console.log("⚠️ Web Speech API no soportada");
                 return;
             }}
-            
-            // Cancelar cualquier mensaje anterior
             synthesis.cancel();
-            
             const utterance = new SpeechSynthesisUtterance(texto);
             utterance.lang = 'es-MX';
             utterance.rate = 0.95;
             utterance.pitch = 1.0;
             utterance.volume = 1.0;
-            
-            // Intentar seleccionar voz en español
-            if (synthesis.getVoices && synthesis.getVoices().length > 0) {{
-                const vocesEs = synthesis.getVoices().filter(v => v.lang.includes('es'));
-                if (vocesEs.length > 0) {{
-                    utterance.voice = vocesEs[0];
-                }}
-            }}
-            
-            // Manejo de errores
-            utterance.onerror = (event) => {{
-                console.error("❌ Error en síntesis de voz:", event.error);
-            }};
-            
-            utterance.onend = () => {{
-                console.log("✅ Mensaje de voz completado");
-            }};
-            
             synthesis.speak(utterance);
             console.log("🔊 Hablando:", texto);
         }}
         
         function hablarDecision(decision, humedad) {{
-            if (!decision || humedad === undefined || humedad === null) return;
-            
-            // Normalizar decisión para comparación
+            if (!decision) return;
             const decisionLower = decision.toLowerCase();
             let mensaje = "";
-            
             if (decisionLower.includes("regar") && !decisionLower.includes("no")) {{
                 mensaje = `Humedad del suelo en ${{humedad}} por ciento. Es momento de regar.`;
             }} else {{
@@ -373,8 +339,7 @@ def generar_html(context):
         }}
         
         function alertaCritica(humedad) {{
-            if (humedad === undefined || humedad === null) return;
-            
+            if (humedad === undefined) return;
             if (humedad < 25) {{
                 hablar(`¡Alerta crítica! La humedad del suelo está en ${{humedad}} por ciento. Active el riego de inmediato.`);
             }} else if (humedad < 35) {{
@@ -383,14 +348,12 @@ def generar_html(context):
         }}
         
         function repetirMensaje() {{
-            // Variables inyectadas desde Python
             hablarDecision("{decision_js}", {humedad_js});
         }}
         
         function silenciarVoz() {{
             if (synthesis) {{
                 synthesis.cancel();
-                console.log("🔇 Voz silenciada por usuario");
             }}
         }}
         // =====================================
@@ -427,7 +390,7 @@ def generar_html(context):
                         }}
                     }}
                 }});
-            }} catch(e) {{ console.error("❌ Error gráfica humedad:", e); }}
+            }} catch(e) {{ console.error("Error gráfica humedad:", e); }}
         }}
         
         // ========== GRÁFICA 2: Comparativa ==========
@@ -435,7 +398,6 @@ def generar_html(context):
             try {{
                 const response = await fetch('/api/historial');
                 const data = await response.json();
-                // Generar temperaturas simuladas basadas en humedad (para demo)
                 const temperaturas = data.humedades.map(h => 20 + (h / 100) * 25);
                 const ctx = document.getElementById('comparativaChart').getContext('2d');
                 new Chart(ctx, {{
@@ -477,7 +439,7 @@ def generar_html(context):
                         }}
                     }}
                 }});
-            }} catch(e) {{ console.error("❌ Error gráfica comparativa:", e); }}
+            }} catch(e) {{ console.error("Error gráfica comparativa:", e); }}
         }}
         
         // ========== GRÁFICA 3: Decisiones (Pastel) ==========
@@ -505,7 +467,7 @@ def generar_html(context):
                         }}
                     }}
                 }});
-            }} catch(e) {{ console.error("❌ Error gráfica decisiones:", e); }}
+            }} catch(e) {{ console.error("Error gráfica decisiones:", e); }}
         }}
         
         // ========== GRÁFICA 4: Riegos por día ==========
@@ -535,7 +497,7 @@ def generar_html(context):
                         }}
                     }}
                 }});
-            }} catch(e) {{ console.error("❌ Error gráfica riegos:", e); }}
+            }} catch(e) {{ console.error("Error gráfica riegos:", e); }}
         }}
         
         // ========== RIEGO MANUAL CON VOZ ==========
@@ -553,7 +515,7 @@ def generar_html(context):
                     hablar("Error al activar el riego manual.");
                 }}
             }} catch (error) {{
-                console.error('❌ Error:', error);
+                console.error('Error:', error);
                 document.getElementById('mensajeRiego').innerHTML = '<div class="alert alert-danger">❌ Error de conexión</div>';
                 hablar("Error de conexión con el servidor.");
             }}
@@ -561,29 +523,24 @@ def generar_html(context):
         
         // ========== INICIALIZACIÓN AL CARGAR ==========
         window.addEventListener('load', () => {{
-            // Cargar gráficas inmediatamente
             cargarGraficaHumedad();
             cargarGraficaComparativa();
             cargarGraficaDecisiones();
             cargarGraficaRiegos();
             
-            // Activar voz después de un delay para asegurar que el DOM y las voces estén listas
             setTimeout(() => {{
                 console.log("🎤 Iniciando asistente de voz...");
-                // Variables inyectadas desde Python
                 hablarDecision("{decision_js}", {humedad_js});
                 alertaCritica({humedad_js});
             }}, 2000);
         }});
         
-        // Permitir silenciar con tecla Escape
         document.addEventListener('keydown', (e) => {{
             if (e.key === 'Escape') {{
                 silenciarVoz();
             }}
         }});
         
-        // Limpiar síntesis al cerrar la página
         window.addEventListener('beforeunload', () => {{
             if (synthesis) {{
                 synthesis.cancel();
@@ -663,11 +620,11 @@ async def dashboard(request: Request):
         ia = ModeloRiego()
         ia.cargar_o_crear()
 
-        clima = obtener_clima_real() or {{
+        clima = obtener_clima_real() or {
             "temperatura_ambiente": 28.0, 
             "humedad_ambiente": 45.0, 
             "descripcion": "Cielo despejado (simulado)"
-        }}
+        }
         
         humedad_suelo = round(random.uniform(15, 55), 1)
         decision = ia.predecir(humedad_suelo, clima["temperatura_ambiente"])
@@ -675,7 +632,7 @@ async def dashboard(request: Request):
         historial = []
         try:
             if hasattr(bd, 'db'):
-                registros = bd.db['registros'].find({{}}).sort('fecha', -1).limit(20)
+                registros = bd.db['registros'].find({}).sort('fecha', -1).limit(20)
                 for reg in registros:
                     fecha = reg.get('fecha', None)
                     if fecha and hasattr(fecha, 'strftime'):
@@ -683,18 +640,18 @@ async def dashboard(request: Request):
                     else:
                         fecha_str = str(fecha) if fecha else "Sin fecha"
                     
-                    historial.append({{
+                    historial.append({
                         "fecha": fecha_str,
                         "humedad_suelo": reg.get('humedad_suelo', 'N/A'),
                         "temperatura": reg.get('temperatura', 'N/A'),
                         "decision": reg.get('decision', 'N/A')
-                    }})
-                print(f"📊 Historial cargado: {{len(historial)}} registros")
+                    })
+                print(f"📊 Historial cargado: {len(historial)} registros")
         except Exception as e:
-            print(f"⚠️ Error cargando historial: {{e}}")
+            print(f"⚠️ Error cargando historial: {e}")
             historial = []
 
-        context = {{
+        context = {
             "humedad_suelo": float(humedad_suelo),
             "temp": float(clima.get("temperatura_ambiente", 25.0)),
             "hum_amb": float(clima.get("humedad_ambiente", 45.0)),
@@ -702,16 +659,16 @@ async def dashboard(request: Request):
             "decision": str(decision) if decision else "Sin decisión",
             "historial": historial,
             "now": datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-        }}
+        }
         
         html_content = generar_html(context)
         return HTMLResponse(content=html_content)
         
     except Exception as e:
-        print(f"❌ Error general: {{e}}")
+        print(f"❌ Error general: {e}")
         import traceback
         traceback.print_exc()
-        return HTMLResponse(content=f"<html><body><h1>Error</h1><p>{{str(e)}}</p></body></html>", status_code=500)
+        return HTMLResponse(content=f"<html><body><h1>Error</h1><p>{str(e)}</p></body></html>", status_code=500)
 
 
 @app.post("/regar")
@@ -719,27 +676,23 @@ async def activar_riego_manual():
     try:
         bd = GestorBD()
         if hasattr(bd, 'db'):
-            registro = {{
+            registro = {
                 "fecha": datetime.now(),
                 "humedad_suelo": 0,
                 "temperatura": 0,
                 "decision": "regar_manual",
                 "tipo": "manual"
-            }}
+            }
             bd.db['registros'].insert_one(registro)
             print("✅ Riego manual registrado")
-        return {{"status": "success"}}
+        return {"status": "success"}
     except Exception as e:
-        print(f"❌ Error en riego manual: {{e}}")
-        return {{"status": "error"}}
+        print(f"❌ Error en riego manual: {e}")
+        return {"status": "error"}
 
 
 if __name__ == "__main__":
     print("🚀 AgroVoice Pro Web → http://localhost:8000")
     print("🔊 Sistema de voz integrado")
     print("📊 4 gráficas profesionales activas")
-    print("💡 Tips de uso:")
-    print("   • Presiona ESC para silenciar la voz")
-    print("   • Usa el botón 'Repetir mensaje' para escuchar de nuevo")
-    print("   • Compatible con Chrome, Edge y Safari")
     uvicorn.run("app_web:app", host="0.0.0.0", port=8000, reload=True)
