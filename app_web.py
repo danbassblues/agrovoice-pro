@@ -52,7 +52,7 @@ app = FastAPI(title="AgroVoice Pro")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 def generar_html(context):
-    """Genera el HTML con los datos del historial incluidos"""
+    """Genera el HTML con los datos del historial incluidos y gráfica"""
     
     # Construir filas de la tabla del historial
     filas_tabla = ""
@@ -77,6 +77,7 @@ def generar_html(context):
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AgroVoice Pro - Sistema de Riego Inteligente</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {{
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -87,6 +88,7 @@ def generar_html(context):
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             margin-bottom: 20px;
+            background: white;
         }}
         .dashboard-title {{
             color: white;
@@ -117,7 +119,7 @@ def generar_html(context):
             transform: scale(1.05);
         }}
         .historial-table {{
-            max-height: 400px;
+            max-height: 300px;
             overflow-y: auto;
         }}
         .table {{
@@ -125,6 +127,10 @@ def generar_html(context):
         }}
         .progress-bar {{
             background-color: #28a745;
+        }}
+        .chart-container {{
+            padding: 20px;
+            height: 320px;
         }}
     </style>
 </head>
@@ -167,6 +173,20 @@ def generar_html(context):
                         <h5 class="card-title">💨 Humedad Ambiente</h5>
                         <div class="sensor-value">{context['hum_amb']}%</div>
                         <p class="mt-2">{context['descripcion']}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GRÁFICA DE TENDENCIA -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5>📈 Tendencia de Humedad (Últimas 24h)</h5>
+                        <div class="chart-container">
+                            <canvas id="humedadChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -216,6 +236,71 @@ def generar_html(context):
     </div>
 
     <script>
+        // Cargar datos para la gráfica
+        async function cargarGrafica() {{
+            try {{
+                const response = await fetch('/api/historial');
+                const data = await response.json();
+                
+                const ctx = document.getElementById('humedadChart').getContext('2d');
+                
+                new Chart(ctx, {{
+                    type: 'line',
+                    data: {{
+                        labels: data.fechas,
+                        datasets: [{{
+                            label: 'Humedad del Suelo (%)',
+                            data: data.humedades,
+                            borderColor: '#667eea',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#764ba2',
+                            pointBorderColor: '#fff',
+                            pointRadius: 5,
+                            pointHoverRadius: 7
+                        }}]
+                    }},
+                    options: {{
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {{
+                            legend: {{
+                                position: 'top',
+                            }},
+                            tooltip: {{
+                                callbacks: {{
+                                    label: function(context) {{
+                                        return context.parsed.y + '%';
+                                    }}
+                                }}
+                            }}
+                        }},
+                        scales: {{
+                            y: {{
+                                beginAtZero: true,
+                                max: 100,
+                                title: {{
+                                    display: true,
+                                    text: 'Humedad (%)'
+                                }}
+                            }},
+                            x: {{
+                                title: {{
+                                    display: true,
+                                    text: 'Hora'
+                                }}
+                            }}
+                        }}
+                    }}
+                }});
+            }} catch (error) {{
+                console.error('Error cargando gráfica:', error);
+            }}
+        }}
+        
+        // Función para riego manual
         async function activarRiegoManual() {{
             try {{
                 const response = await fetch('/regar', {{ method: 'POST' }});
@@ -232,11 +317,13 @@ def generar_html(context):
                 document.getElementById('mensajeRiego').innerHTML = '<div class="alert alert-danger">❌ Error de conexión</div>';
             }}
         }}
+        
+        // Cargar gráfica al iniciar
+        cargarGrafica();
     </script>
 </body>
 </html>
     """
-
 @app.get("/", response_class=HTMLResponse)
 async def dashboard(request: Request):
     try:
@@ -326,6 +413,39 @@ async def activar_riego_manual():
     except Exception as e:
         print(f"❌ Error en riego manual: {e}")
         return {"status": "error"}
+
+
+@app.get("/api/historial")
+async def api_historial():
+    """API para obtener datos de la gráfica"""
+    try:
+        bd = GestorBD()
+        registros = list(bd.db['registros']
+                        .find({}, {'_id': 0, 'fecha': 1, 'humedad_suelo': 1})
+                        .sort('fecha', -1)
+                        .limit(24))
+        
+        # Invertir para orden cronológico
+        registros.reverse()
+        
+        # Formatear para la gráfica
+        datos = {
+            "fechas": [],
+            "humedades": []
+        }
+        
+        for reg in registros:
+            fecha = reg.get('fecha')
+            if fecha and hasattr(fecha, 'strftime'):
+                datos["fechas"].append(fecha.strftime("%H:%M"))
+            else:
+                datos["fechas"].append("N/A")
+            datos["humedades"].append(reg.get('humedad_suelo', 0))
+        
+        return datos
+    except Exception as e:
+        print(f"Error en API: {e}")
+        return {"fechas": [], "humedades": []}
 
 
 if __name__ == "__main__":
