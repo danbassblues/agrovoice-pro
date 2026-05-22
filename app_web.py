@@ -602,12 +602,12 @@ async def api_historial():
     try:
         bd = GestorBD()
         registros = list(bd.db['registros']
-                        .find({}, {{'_id': 0, 'fecha': 1, 'humedad_suelo': 1}})
+                        .find({}, {'_id': 0, 'fecha': 1, 'humedad_suelo': 1})
                         .sort('fecha', -1)
                         .limit(24))
         registros.reverse()
         
-        datos = {{"fechas": [], "humedades": []}}
+        datos = {"fechas": [], "humedades": []}
         for reg in registros:
             fecha = reg.get('fecha')
             if fecha and hasattr(fecha, 'strftime'):
@@ -617,8 +617,8 @@ async def api_historial():
             datos["humedades"].append(reg.get('humedad_suelo', 0))
         return datos
     except Exception as e:
-        print(f"❌ Error en API historial: {{e}}")
-        return {{"fechas": [], "humedades": []}}
+        print(f"Error en API historial: {e}")
+        return {"fechas": [], "humedades": []}
 
 
 @app.get("/api/estadisticas")
@@ -626,13 +626,13 @@ async def api_estadisticas():
     """API para estadísticas de decisiones"""
     try:
         bd = GestorBD()
-        total_regar = bd.db['registros'].count_documents({{"decision": "regar"}})
-        total_no_regar = bd.db['registros'].count_documents({{"decision": "no_regar"}})
-        total_manual = bd.db['registros'].count_documents({{"decision": "regar_manual"}})
-        return {{"regar": total_regar, "no_regar": total_no_regar, "manual": total_manual}}
+        total_regar = bd.db['registros'].count_documents({"decision": "regar"})
+        total_no_regar = bd.db['registros'].count_documents({"decision": "no_regar"})
+        total_manual = bd.db['registros'].count_documents({"decision": "regar_manual"})
+        return {"regar": total_regar, "no_regar": total_no_regar, "manual": total_manual}
     except Exception as e:
-        print(f"❌ Error en estadisticas: {{e}}")
-        return {{"regar": 0, "no_regar": 0, "manual": 0}}
+        print(f"Error en estadisticas: {e}")
+        return {"regar": 0, "no_regar": 0, "manual": 0}
 
 
 @app.get("/api/riegos-por-dia")
@@ -641,16 +641,16 @@ async def api_riegos_por_dia():
     try:
         bd = GestorBD()
         pipeline = [
-            {{"$group": {{"_id": {{"$dateToString": {{"format": "%d/%m", "date": "$fecha"}}}}, "count": {{"$sum": 1}}}}},
-            {{"$sort": {{"_id": -1}}}},
-            {{"$limit": 7}}
+            {"$group": {"_id": {"$dateToString": {"format": "%d/%m", "date": "$fecha"}}, "count": {"$sum": 1}}},
+            {"$sort": {"_id": -1}},
+            {"$limit": 7}
         ]
         resultados = list(bd.db['registros'].aggregate(pipeline))
         resultados.reverse()
-        return {{"dias": [r["_id"] for r in resultados], "cantidades": [r["count"] for r in resultados]}}
+        return {"dias": [r["_id"] for r in resultados], "cantidades": [r["count"] for r in resultados]}
     except Exception as e:
-        print(f"❌ Error en riegos-por-dia: {{e}}")
-        return {{"dias": [], "cantidades": []}}
+        print(f"Error en riegos-por-dia: {e}")
+        return {"dias": [], "cantidades": []}
 
 
 # ==================== ENDPOINTS PRINCIPALES ====================
