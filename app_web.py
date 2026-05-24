@@ -1,4 +1,4 @@
-# app_web.py - AgroVoice Pro con Sistema de Voz, 4 Gráficas, Estadísticas y Predicción
+# app_web.py - AgroVoice Pro con Sistema de Voz y 4 Gráficas (VERSIÓN ESTABLE)
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
@@ -20,9 +20,9 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 # Intentar importar config
 try:
     import config
-    print(" config.py importado correctamente")
+    print("✅ config.py importado correctamente")
 except Exception as e:
-    print(f" Error importando config: {e}")
+    print(f"❌ Error importando config: {e}")
     class config:
         MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
         MONGO_DB_NAME = "agrovoice"
@@ -32,7 +32,7 @@ except Exception as e:
         OPENWEATHER_API_KEY = ""
         LATITUD = 25.6866
         LONGITUD = -100.3161
-    print(" Usando configuración de respaldo")
+    print("⚠️ Usando configuración de respaldo")
 
 from src_core.ia_modelo import ModeloRiego
 from src_core.base_datos import GestorBD
@@ -42,7 +42,7 @@ app = FastAPI(title="AgroVoice Pro")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 def generar_html(context):
-    """Genera el HTML con 4 gráficas, sistema de voz, estadísticas y predicción"""
+    """Genera el HTML con 4 graficas profesionales y sistema de voz"""
     
     # Construir filas de la tabla del historial
     filas_tabla = ""
@@ -59,7 +59,7 @@ def generar_html(context):
     if not context['historial']:
         filas_tabla = '<tr><td colspan="4" class="text-center">No hay registros aún</td></tr>'
     
-    # Variables para inyección segura en JavaScript
+    # Variables para inyeccion segura en JavaScript
     decision_js = context['decision'].lower().replace('"', '\\"')
     humedad_js = context['humedad_suelo']
     
@@ -165,26 +165,15 @@ def generar_html(context):
             font-size: 0.75em;
             font-weight: bold;
         }}
-        .stat-number {{
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #667eea;
-        }}
-        .prediccion-box {{
-            text-align: center;
-            padding: 15px;
-            border-radius: 15px;
-            margin: 10px 0;
-        }}
     </style>
 </head>
 <body>
     <div class="container">
         <div class="dashboard-title">
-            <h1> AgroVoice Pro</h1>
+            <h1>🌾 AgroVoice Pro</h1>
             <p>Sistema de Riego Inteligente con Asistente de Voz</p>
-            <small>Última actualización: {context['now']}</small>
-            <span class="badge-voz"> Voz Activa</span>
+            <small>Ultima actualizacion: {context['now']}</small>
+            <span class="badge-voz">Voz Activa</span>
         </div>
 
         <!-- Tarjetas de sensores -->
@@ -192,14 +181,14 @@ def generar_html(context):
             <div class="col-md-4">
                 <div class="card">
                     <div class="card-body text-center">
-                        <h5 class="card-title"> Humedad del Suelo</h5>
+                        <h5 class="card-title">Humedad del Suelo</h5>
                         <div class="sensor-value">{context['humedad_suelo']}%</div>
                         <div class="mt-2">
                             <div class="progress">
                                 <div class="progress-bar" style="width: {context['humedad_suelo']}%"></div>
                             </div>
                         </div>
-                        <small class="text-muted">Nivel óptimo: 30-70%</small>
+                        <small class="text-muted">Nivel optimo: 30-70%</small>
                     </div>
                 </div>
             </div>
@@ -207,7 +196,7 @@ def generar_html(context):
             <div class="col-md-4">
                 <div class="card">
                     <div class="card-body text-center">
-                        <h5 class="card-title"> Temperatura Ambiente</h5>
+                        <h5 class="card-title">Temperatura Ambiente</h5>
                         <div class="sensor-value">{context['temp']}°C</div>
                     </div>
                 </div>
@@ -216,7 +205,7 @@ def generar_html(context):
             <div class="col-md-4">
                 <div class="card">
                     <div class="card-body text-center">
-                        <h5 class="card-title">💨 Humedad Ambiente</h5>
+                        <h5 class="card-title">Humedad Ambiente</h5>
                         <div class="sensor-value">{context['hum_amb']}%</div>
                         <p class="mt-2">{context['descripcion']}</p>
                     </div>
@@ -224,12 +213,12 @@ def generar_html(context):
             </div>
         </div>
 
-        <!-- GRÁFICA 1: Tendencia de Humedad -->
+        <!-- GRAFICA 1: Tendencia de Humedad -->
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-body">
-                        <div class="grafica-titulo"> Tendencia de Humedad (Últimas 24h)</div>
+                        <div class="grafica-titulo">Tendencia de Humedad (Ultimas 24h)</div>
                         <div class="chart-container">
                             <canvas id="humedadChart"></canvas>
                         </div>
@@ -238,12 +227,12 @@ def generar_html(context):
             </div>
         </div>
 
-        <!-- GRÁFICAS 2 y 3 -->
+        <!-- GRAFICAS 2 y 3 -->
         <div class="row">
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-body">
-                        <div class="grafica-titulo"> Comparativa: Humedad vs Temperatura</div>
+                        <div class="grafica-titulo">Comparativa: Humedad vs Temperatura</div>
                         <div class="chart-container">
                             <canvas id="comparativaChart"></canvas>
                         </div>
@@ -253,7 +242,7 @@ def generar_html(context):
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-body">
-                        <div class="grafica-titulo"> Distribución de Decisiones</div>
+                        <div class="grafica-titulo">Distribucion de Decisiones</div>
                         <div class="chart-container">
                             <canvas id="decisionesChart"></canvas>
                         </div>
@@ -262,12 +251,12 @@ def generar_html(context):
             </div>
         </div>
 
-        <!-- GRÁFICA 4: Riegos por día -->
+        <!-- GRAFICA 4: Riegos por dia -->
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-body">
-                        <div class="grafica-titulo"> Riegos por Día (Última semana)</div>
+                        <div class="grafica-titulo">Riegos por Dia (Ultima semana)</div>
                         <div class="chart-container">
                             <canvas id="riegosChart"></canvas>
                         </div>
@@ -276,52 +265,20 @@ def generar_html(context):
             </div>
         </div>
 
-        <!-- 🆕 NUEVA SECCIÓN: ESTADÍSTICAS Y PREDICCIÓN -->
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="grafica-titulo"> Distribución de Datos Históricos</div>
-                        <div id="estadisticas-container">
-                            <div class="text-center">
-                                <div class="spinner-border text-primary" role="status">
-                                    <span class="visually-hidden">Cargando...</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="grafica-titulo"> Predicción para Mañana</div>
-                        <div id="prediccion-container">
-                            <div class="text-center">
-                                <div class="spinner-border text-primary" role="status">
-                                    <span class="visually-hidden">Cargando...</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Decisión del Sistema -->
+        <!-- Decision del Sistema -->
         <div class="row">
             <div class="col-md-12">
                 <div class="card decision-card">
                     <div class="card-body">
-                        <h3> Decisión del Sistema</h3>
+                        <h3>Decision del Sistema</h3>
                         <div class="sensor-value" style="font-size: 1.8em; color: {'#28a745' if 'regar' in context['decision'].lower() else '#dc3545'}">
                             {context['decision']}
                         </div>
                         <button class="btn-voz" onclick="repetirMensaje()">
-                             Repetir mensaje
+                            Repetir mensaje
                         </button>
                         <button class="btn-riego mt-3" onclick="activarRiegoManual()">
-                             Activar Riego Manual
+                            Activar Riego Manual
                         </button>
                         <div id="mensajeRiego" class="mt-3"></div>
                     </div>
@@ -334,16 +291,16 @@ def generar_html(context):
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-body">
-                        <h5> Historial de Riegos</h5>
+                        <h5>Historial de Riegos</h5>
                         <div class="historial-table">
                             <table class="table table-striped table-sm">
                                 <thead>
-                                    <tr><th>Fecha/Hora</th><th>Humedad</th><th>Temperatura</th><th>Decisión</th></tr>
+                                    <tr><th>Fecha/Hora</th><th>Humedad</th><th>Temperatura</th><th>Decision</th></tr>
                                 </thead>
                                 <tbody>
                                     {filas_tabla}
                                 </tbody>
-                            <table>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -357,7 +314,7 @@ def generar_html(context):
         
         function hablar(texto) {{
             if (!synthesis) {{
-                console.log(" Web Speech API no soportada");
+                console.log("Web Speech API no soportada");
                 return;
             }}
             synthesis.cancel();
@@ -367,7 +324,7 @@ def generar_html(context):
             utterance.pitch = 1.0;
             utterance.volume = 1.0;
             synthesis.speak(utterance);
-            console.log(" Hablando:", texto);
+            console.log("Hablando:", texto);
         }}
         
         function hablarDecision(decision, humedad) {{
@@ -385,9 +342,9 @@ def generar_html(context):
         function alertaCritica(humedad) {{
             if (humedad === undefined) return;
             if (humedad < 25) {{
-                hablar(`¡Alerta crítica! La humedad del suelo está en ${{humedad}} por ciento. Active el riego de inmediato.`);
+                hablar(`¡Alerta critica! La humedad del suelo esta en ${{humedad}} por ciento. Active el riego de inmediato.`);
             }} else if (humedad < 35) {{
-                hablar(`Atención: la humedad del suelo está en ${{humedad}} por ciento. Considere regar pronto.`);
+                hablar(`Atencion: la humedad del suelo esta en ${{humedad}} por ciento. Considere regar pronto.`);
             }}
         }}
         
@@ -400,8 +357,8 @@ def generar_html(context):
                 synthesis.cancel();
             }}
         }}
-
-        // ========== GRÁFICA 1: Tendencia de Humedad ==========
+        
+        // ========== GRAFICA 1: Tendencia de Humedad ==========
         async function cargarGraficaHumedad() {{
             try {{
                 const response = await fetch('/api/historial');
@@ -433,10 +390,10 @@ def generar_html(context):
                         }}
                     }}
                 }});
-            }} catch(e) {{ console.error("Error gráfica humedad:", e); }}
+            }} catch(e) {{ console.error("Error grafica humedad:", e); }}
         }}
         
-        // ========== GRÁFICA 2: Comparativa ==========
+        // ========== GRAFICA 2: Comparativa ==========
         async function cargarGraficaComparativa() {{
             try {{
                 const response = await fetch('/api/historial');
@@ -482,10 +439,10 @@ def generar_html(context):
                         }}
                     }}
                 }});
-            }} catch(e) {{ console.error("Error gráfica comparativa:", e); }}
+            }} catch(e) {{ console.error("Error grafica comparativa:", e); }}
         }}
         
-        // ========== GRÁFICA 3: Decisiones (Pastel) ==========
+        // ========== GRAFICA 3: Decisiones (Pastel) ==========
         async function cargarGraficaDecisiones() {{
             try {{
                 const response = await fetch('/api/estadisticas');
@@ -494,7 +451,7 @@ def generar_html(context):
                 new Chart(ctx, {{
                     type: 'doughnut',
                     data: {{
-                        labels: [' Regar', ' No Regar', ' Manual'],
+                        labels: ['Regar', 'No Regar', 'Manual'],
                         datasets: [{{
                             data: [data.regar || 0, data.no_regar || 0, data.manual || 0],
                             backgroundColor: ['#28a745', '#dc3545', '#ffc107'],
@@ -510,10 +467,10 @@ def generar_html(context):
                         }}
                     }}
                 }});
-            }} catch(e) {{ console.error("Error gráfica decisiones:", e); }}
+            }} catch(e) {{ console.error("Error grafica decisiones:", e); }}
         }}
         
-        // ========== GRÁFICA 4: Riegos por día ==========
+        // ========== GRAFICA 4: Riegos por dia ==========
         async function cargarGraficaRiegos() {{
             try {{
                 const response = await fetch('/api/riegos-por-dia');
@@ -540,114 +497,9 @@ def generar_html(context):
                         }}
                     }}
                 }});
-            }} catch(e) {{ console.error("Error gráfica riegos:", e); }}
+            }} catch(e) {{ console.error("Error grafica riegos:", e); }}
         }}
         
-               // ========== ESTADÍSTICAS DE DATOS ==========
-        async function cargarEstadisticas() {
-            try {
-                const response = await fetch('/api/estadisticas-datos');
-                const data = await response.json();
-                
-                if (data.error) {
-                    document.getElementById('estadisticas-container').innerHTML = 
-                        '<div class="alert alert-warning">No hay datos disponibles</div>';
-                    return;
-                }
-                
-                const total = data.total;
-                const p25_35 = ((data.rango_25_35 / total) * 100).toFixed(1);
-                const p35_45 = ((data.rango_35_45 / total) * 100).toFixed(1);
-                const p45_55 = ((data.rango_45_55 / total) * 100).toFixed(1);
-                const p55_65 = ((data.rango_55_65 / total) * 100).toFixed(1);
-                
-                const html = `
-                    <div style="margin-bottom: 15px;">
-                        <div style="background: #e9ecef; border-radius: 10px; margin-bottom: 8px;">
-                            <div style="background: #28a745; width: ${{p25_35}}%; border-radius: 10px; padding: 5px; color: white;">25-35%: ${{p25_35}}%</div>
-                        </div>
-                        <div style="background: #e9ecef; border-radius: 10px; margin-bottom: 8px;">
-                            <div style="background: #17a2b8; width: ${{p35_45}}%; border-radius: 10px; padding: 5px; color: white;">35-45%: ${{p35_45}}%</div>
-                        </div>
-                        <div style="background: #e9ecef; border-radius: 10px; margin-bottom: 8px;">
-                            <div style="background: #ffc107; width: ${{p45_55}}%; border-radius: 10px; padding: 5px; color: #333;">45-55%: ${{p45_55}}%</div>
-                        </div>
-                        <div style="background: #e9ecef; border-radius: 10px; margin-bottom: 8px;">
-                            <div style="background: #dc3545; width: ${{p55_65}}%; border-radius: 10px; padding: 5px; color: white;">55-65%: ${{p55_65}}%</div>
-                        </div>
-                    </div>
-                    <table class="table table-sm">
-                        <tr><td> Total registros</td><td><strong>${{data.total}}</strong></td></tr>
-                        <tr><td> Media de humedad</td><td><strong>${{data.media}}%</strong></td></tr>
-                        <tr><td> Mediana</td><td><strong>${{data.mediana}}%</strong></td></tr>
-                        <tr><td> Desviación estándar</td><td><strong>${{data.desviacion}}%</strong></td></tr>
-                        <tr><td> Mínimo</td><td><strong>${{data.minimo}}%</strong></td></tr>
-                        <tr><td> Máximo</td><td><strong>${{data.maximo}}%</strong></td></tr>
-                    </table>
-                `;
-                document.getElementById('estadisticas-container').innerHTML = html;
-            } catch(e) {
-                console.error("Error cargando estadisticas:", e);
-                document.getElementById('estadisticas-container').innerHTML = 
-                    '<div class="alert alert-danger">Error cargando estadísticas</div>';
-            }
-        }
-        
-      
-        // ========== PREDICCIÓN PARA MAÑANA ==========
-        async function cargarPrediccionManana() {
-            try {
-                const response = await fetch('/api/prediccion-manana');
-                const data = await response.json();
-                
-                if (data.error) {
-                    document.getElementById('prediccion-container').innerHTML = 
-                        '<div class="alert alert-warning">No hay datos suficientes para predicción</div>';
-                    return;
-                }
-                
-                const colorDecision = data.decision === 'regar' ? '#28a745' : '#dc3545';
-                const iconoDecision = data.decision === 'regar' ? '' : '';
-                
-                const html = `
-                    <div style="text-align: center;">
-                        <div style="font-size: 0.9em; margin-bottom: 15px; color: #666;">
-                             Basado en ${{data.base_datos}} registros recientes
-                        </div>
-                        <div style="display: flex; justify-content: space-around; margin-bottom: 20px;">
-                            <div>
-                                <div> Humedad estimada</div>
-                                <div style="font-size: 2em; font-weight: bold;">${{data.humedad_estimada}}%</div>
-                            </div>
-                            <div>
-                                <div> Temperatura</div>
-                                <div style="font-size: 2em; font-weight: bold;">${{data.temperatura_estimada}}°C</div>
-                            </div>
-                        </div>
-                        <div style="background: ${{colorDecision}}; border-radius: 15px; padding: 15px; margin: 15px 0;">
-                            <div style="font-size: 1.5em; font-weight: bold; color: white;">
-                                ${{iconoDecision}} ${{data.decision.toUpperCase()}}
-                            </div>
-                        </div>
-                        <div style="margin-top: 15px;">
-                            <div style="font-size: 0.9em; margin-bottom: 5px;"> Probabilidad de la predicción</div>
-                            <div style="position: relative; height: 30px; background: #e9ecef; border-radius: 15px; margin: 10px 0;">
-                                <div style="position: absolute; width: ${{data.probabilidad}}%; background: ${{colorDecision}}; height: 30px; border-radius: 15px; text-align: center; color: white; line-height: 30px;">
-                                    ${{data.probabilidad}}%
-                                </div>
-                            </div>
-                            <small class="text-muted">Basado en tendencia histórica de 30 días</small>
-                        </div>
-                    </div>
-                `;
-                document.getElementById('prediccion-container').innerHTML = html;
-            } catch(e) {
-                console.error("Error cargando prediccion:", e);
-            }
-        }
-
-
-      
         // ========== RIEGO MANUAL CON VOZ ==========
         async function activarRiegoManual() {{
             try {{
@@ -655,31 +507,29 @@ def generar_html(context):
                 const data = await response.json();
                 const mensajeDiv = document.getElementById('mensajeRiego');
                 if (data.status === 'success') {{
-                    mensajeDiv.innerHTML = '<div class="alert alert-success"> Riego activado correctamente</div>';
-                    hablar("Riego manual activado. El sistema está regando el cultivo.");
+                    mensajeDiv.innerHTML = '<div class="alert alert-success">Riego activado correctamente</div>';
+                    hablar("Riego manual activado. El sistema esta regando el cultivo.");
                     setTimeout(() => location.reload(), 3000);
                 }} else {{
-                    mensajeDiv.innerHTML = '<div class="alert alert-danger"> Error al activar el riego</div>';
+                    mensajeDiv.innerHTML = '<div class="alert alert-danger">Error al activar el riego</div>';
                     hablar("Error al activar el riego manual.");
                 }}
             }} catch (error) {{
                 console.error('Error:', error);
-                document.getElementById('mensajeRiego').innerHTML = '<div class="alert alert-danger"> Error de conexión</div>';
-                hablar("Error de conexión con el servidor.");
+                document.getElementById('mensajeRiego').innerHTML = '<div class="alert alert-danger">Error de conexion</div>';
+                hablar("Error de conexion con el servidor.");
             }}
         }}
         
-        // ========== INICIALIZACIÓN AL CARGAR ==========
+        // ========== INICIALIZACION AL CARGAR ==========
         window.addEventListener('load', () => {{
             cargarGraficaHumedad();
             cargarGraficaComparativa();
             cargarGraficaDecisiones();
             cargarGraficaRiegos();
-            cargarEstadisticas();
-            cargarPrediccionManana();
             
             setTimeout(() => {{
-                console.log(" Iniciando asistente de voz...");
+                console.log("Iniciando asistente de voz...");
                 hablarDecision("{decision_js}", {humedad_js});
                 alertaCritica({humedad_js});
             }}, 2000);
@@ -701,7 +551,7 @@ def generar_html(context):
 </html>
     """
 
-# ==================== APIS PARA GRÁFICAS ====================
+# ==================== APIS PARA GRAFICAS ====================
 
 @app.get("/api/historial")
 async def api_historial():
@@ -730,7 +580,7 @@ async def api_historial():
 
 @app.get("/api/estadisticas")
 async def api_estadisticas():
-    """API para estadísticas de decisiones"""
+    """API para estadisticas de decisiones"""
     try:
         bd = GestorBD()
         total_regar = bd.db['registros'].count_documents({"decision": "regar"})
@@ -744,7 +594,7 @@ async def api_estadisticas():
 
 @app.get("/api/riegos-por-dia")
 async def api_riegos_por_dia():
-    """API para riegos agrupados por día"""
+    """API para riegos agrupados por dia"""
     try:
         bd = GestorBD()
         pipeline = [
@@ -760,97 +610,12 @@ async def api_riegos_por_dia():
         return {"dias": [], "cantidades": []}
 
 
-@app.get("/api/estadisticas-datos")
-async def api_estadisticas_datos():
-    """API para estadísticas descriptivas de los datos históricos"""
-    try:
-        bd = GestorBD()
-        # Obtener todos los datos de humedad
-        sensores = list(bd.db['sensores'].find({}, {'_id': 0, 'humedad_suelo': 1}))
-        
-        humedades = [s['humedad_suelo'] for s in sensores if 'humedad_suelo' in s]
-        
-        if not humedades:
-            return {"error": "No hay datos"}
-        
-        import statistics
-        return {
-            "media": round(statistics.mean(humedades), 1),
-            "mediana": round(statistics.median(humedades), 1),
-            "desviacion": round(statistics.stdev(humedades), 1),
-            "minimo": round(min(humedades), 1),
-            "maximo": round(max(humedades), 1),
-            "total": len(humedades),
-            "rango_25_35": len([h for h in humedades if 25 <= h <= 35]),
-            "rango_35_45": len([h for h in humedades if 35 <= h <= 45]),
-            "rango_45_55": len([h for h in humedades if 45 <= h <= 55]),
-            "rango_55_65": len([h for h in humedades if 55 <= h <= 65])
-        }
-    except Exception as e:
-        print(f"Error en estadisticas-datos: {e}")
-        return {"error": str(e)}
-
-
-@app.get("/api/prediccion-manana")
-async def api_prediccion_manana():
-    """API para predecir si regar mañana basado en datos históricos"""
-    try:
-        bd = GestorBD()
-        
-        # Obtener últimos 30 días de datos
-        sensores = list(bd.db['sensores']
-                       .find({}, {'_id': 0, 'humedad_suelo': 1, 'temperatura': 1})
-                       .sort('fecha', -1)
-                       .limit(30))
-        
-        if not sensores:
-            return {"error": "No hay datos suficientes"}
-        
-        # Calcular promedios recientes
-        humedades_recientes = [s['humedad_suelo'] for s in sensores]
-        temperaturas_recientes = [s['temperatura'] for s in sensores]
-        
-        # Estimación para mañana (promedio)
-        humedad_estimada = round(sum(humedades_recientes) / len(humedades_recientes), 1)
-        temperatura_estimada = round(sum(temperaturas_recientes) / len(temperaturas_recientes), 1)
-        
-        # Decisión basada en umbral
-        decision = "regar" if humedad_estimada < 30 else "no_regar"
-        
-        # Calcular tendencia (diferencia entre primer y último registro)
-        tendencia = humedades_recientes[0] - humedades_recientes[-1] if len(humedades_recientes) > 1 else 0
-        
-        # Calcular probabilidad basada en humedad estimada y tendencia
-        if humedad_estimada < 25:
-            probabilidad = 95
-        elif humedad_estimada < 30:
-            probabilidad = 85
-        elif humedad_estimada < 35:
-            probabilidad = 60 if tendencia < 0 else 40
-        elif humedad_estimada < 45:
-            probabilidad = 30 if tendencia < 0 else 20
-        else:
-            probabilidad = 10
-        
-        return {
-            "humedad_estimada": humedad_estimada,
-            "temperatura_estimada": temperatura_estimada,
-            "decision": decision,
-            "probabilidad": probabilidad,
-            "base_datos": len(humedades_recientes),
-            "tendencia": round(tendencia, 1)
-        }
-    except Exception as e:
-        print(f"Error en prediccion-manana: {e}")
-        return {"error": str(e)}
-
-
 # ==================== ENDPOINTS PRINCIPALES ====================
 
 @app.get("/", response_class=HTMLResponse)
 async def dashboard(request: Request):
     try:
-        print(" Iniciando dashboard...")
+        print("Iniciando dashboard...")
         bd = GestorBD()
         ia = ModeloRiego()
         ia.cargar_o_crear()
@@ -881,9 +646,9 @@ async def dashboard(request: Request):
                         "temperatura": reg.get('temperatura', 'N/A'),
                         "decision": reg.get('decision', 'N/A')
                     })
-                print(f" Historial cargado: {len(historial)} registros")
+                print(f"Historial cargado: {len(historial)} registros")
         except Exception as e:
-            print(f" Error cargando historial: {e}")
+            print(f"Error cargando historial: {e}")
             historial = []
 
         context = {
@@ -891,7 +656,7 @@ async def dashboard(request: Request):
             "temp": float(clima.get("temperatura_ambiente", 25.0)),
             "hum_amb": float(clima.get("humedad_ambiente", 45.0)),
             "descripcion": str(clima.get("descripcion", "")),
-            "decision": str(decision) if decision else "Sin decisión",
+            "decision": str(decision) if decision else "Sin decision",
             "historial": historial,
             "now": datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         }
@@ -900,7 +665,7 @@ async def dashboard(request: Request):
         return HTMLResponse(content=html_content)
         
     except Exception as e:
-        print(f" Error general: {e}")
+        print(f"Error general: {e}")
         import traceback
         traceback.print_exc()
         return HTMLResponse(content=f"<html><body><h1>Error</h1><p>{str(e)}</p></body></html>", status_code=500)
@@ -919,16 +684,15 @@ async def activar_riego_manual():
                 "tipo": "manual"
             }
             bd.db['registros'].insert_one(registro)
-            print(" Riego manual registrado")
+            print("Riego manual registrado")
         return {"status": "success"}
     except Exception as e:
-        print(f" Error en riego manual: {e}")
+        print(f"Error en riego manual: {e}")
         return {"status": "error"}
 
 
 if __name__ == "__main__":
-    print(" AgroVoice Pro Web → http://localhost:8000")
-    print(" Sistema de voz integrado")
-    print(" 4 gráficas profesionales activas")
-    print(" Sección de estadísticas y predicción agregada")
+    print("AgroVoice Pro Web -> http://localhost:8000")
+    print("Sistema de voz integrado")
+    print("4 graficas profesionales activas")
     uvicorn.run("app_web:app", host="0.0.0.0", port=8000, reload=True)
