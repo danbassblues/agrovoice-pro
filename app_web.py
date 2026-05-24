@@ -20,9 +20,9 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 # Intentar importar config
 try:
     import config
-    print("✅ config.py importado correctamente")
+    print(" config.py importado correctamente")
 except Exception as e:
-    print(f"❌ Error importando config: {e}")
+    print(f" Error importando config: {e}")
     class config:
         MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
         MONGO_DB_NAME = "agrovoice"
@@ -32,7 +32,7 @@ except Exception as e:
         OPENWEATHER_API_KEY = ""
         LATITUD = 25.6866
         LONGITUD = -100.3161
-    print("⚠️ Usando configuración de respaldo")
+    print(" Usando configuración de respaldo")
 
 from src_core.ia_modelo import ModeloRiego
 from src_core.base_datos import GestorBD
@@ -181,10 +181,10 @@ def generar_html(context):
 <body>
     <div class="container">
         <div class="dashboard-title">
-            <h1>🌾 AgroVoice Pro</h1>
+            <h1> AgroVoice Pro</h1>
             <p>Sistema de Riego Inteligente con Asistente de Voz</p>
             <small>Última actualización: {context['now']}</small>
-            <span class="badge-voz">🔊 Voz Activa</span>
+            <span class="badge-voz"> Voz Activa</span>
         </div>
 
         <!-- Tarjetas de sensores -->
@@ -192,7 +192,7 @@ def generar_html(context):
             <div class="col-md-4">
                 <div class="card">
                     <div class="card-body text-center">
-                        <h5 class="card-title">💧 Humedad del Suelo</h5>
+                        <h5 class="card-title"> Humedad del Suelo</h5>
                         <div class="sensor-value">{context['humedad_suelo']}%</div>
                         <div class="mt-2">
                             <div class="progress">
@@ -207,7 +207,7 @@ def generar_html(context):
             <div class="col-md-4">
                 <div class="card">
                     <div class="card-body text-center">
-                        <h5 class="card-title">🌡️ Temperatura Ambiente</h5>
+                        <h5 class="card-title"> Temperatura Ambiente</h5>
                         <div class="sensor-value">{context['temp']}°C</div>
                     </div>
                 </div>
@@ -229,7 +229,7 @@ def generar_html(context):
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-body">
-                        <div class="grafica-titulo">📈 Tendencia de Humedad (Últimas 24h)</div>
+                        <div class="grafica-titulo"> Tendencia de Humedad (Últimas 24h)</div>
                         <div class="chart-container">
                             <canvas id="humedadChart"></canvas>
                         </div>
@@ -243,7 +243,7 @@ def generar_html(context):
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-body">
-                        <div class="grafica-titulo">🔄 Comparativa: Humedad vs Temperatura</div>
+                        <div class="grafica-titulo"> Comparativa: Humedad vs Temperatura</div>
                         <div class="chart-container">
                             <canvas id="comparativaChart"></canvas>
                         </div>
@@ -253,7 +253,7 @@ def generar_html(context):
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-body">
-                        <div class="grafica-titulo">🎯 Distribución de Decisiones</div>
+                        <div class="grafica-titulo"> Distribución de Decisiones</div>
                         <div class="chart-container">
                             <canvas id="decisionesChart"></canvas>
                         </div>
@@ -267,7 +267,7 @@ def generar_html(context):
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-body">
-                        <div class="grafica-titulo">📅 Riegos por Día (Última semana)</div>
+                        <div class="grafica-titulo"> Riegos por Día (Última semana)</div>
                         <div class="chart-container">
                             <canvas id="riegosChart"></canvas>
                         </div>
@@ -281,7 +281,7 @@ def generar_html(context):
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-body">
-                        <div class="grafica-titulo">📊 Distribución de Datos Históricos</div>
+                        <div class="grafica-titulo"> Distribución de Datos Históricos</div>
                         <div id="estadisticas-container">
                             <div class="text-center">
                                 <div class="spinner-border text-primary" role="status">
@@ -295,7 +295,7 @@ def generar_html(context):
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-body">
-                        <div class="grafica-titulo">🔮 Predicción para Mañana</div>
+                        <div class="grafica-titulo"> Predicción para Mañana</div>
                         <div id="prediccion-container">
                             <div class="text-center">
                                 <div class="spinner-border text-primary" role="status">
@@ -313,15 +313,15 @@ def generar_html(context):
             <div class="col-md-12">
                 <div class="card decision-card">
                     <div class="card-body">
-                        <h3>🤖 Decisión del Sistema</h3>
+                        <h3> Decisión del Sistema</h3>
                         <div class="sensor-value" style="font-size: 1.8em; color: {'#28a745' if 'regar' in context['decision'].lower() else '#dc3545'}">
                             {context['decision']}
                         </div>
                         <button class="btn-voz" onclick="repetirMensaje()">
-                            🔊 Repetir mensaje
+                             Repetir mensaje
                         </button>
                         <button class="btn-riego mt-3" onclick="activarRiegoManual()">
-                            💧 Activar Riego Manual
+                             Activar Riego Manual
                         </button>
                         <div id="mensajeRiego" class="mt-3"></div>
                     </div>
@@ -334,7 +334,7 @@ def generar_html(context):
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-body">
-                        <h5>📊 Historial de Riegos</h5>
+                        <h5> Historial de Riegos</h5>
                         <div class="historial-table">
                             <table class="table table-striped table-sm">
                                 <thead>
@@ -357,7 +357,7 @@ def generar_html(context):
         
         function hablar(texto) {{
             if (!synthesis) {{
-                console.log("⚠️ Web Speech API no soportada");
+                console.log(" Web Speech API no soportada");
                 return;
             }}
             synthesis.cancel();
@@ -367,7 +367,7 @@ def generar_html(context):
             utterance.pitch = 1.0;
             utterance.volume = 1.0;
             synthesis.speak(utterance);
-            console.log("🔊 Hablando:", texto);
+            console.log(" Hablando:", texto);
         }}
         
         function hablarDecision(decision, humedad) {{
@@ -494,7 +494,7 @@ def generar_html(context):
                 new Chart(ctx, {{
                     type: 'doughnut',
                     data: {{
-                        labels: ['🌊 Regar', '✅ No Regar', '✋ Manual'],
+                        labels: [' Regar', ' No Regar', ' Manual'],
                         datasets: [{{
                             data: [data.regar || 0, data.no_regar || 0, data.manual || 0],
                             backgroundColor: ['#28a745', '#dc3545', '#ffc107'],
@@ -577,12 +577,12 @@ def generar_html(context):
                         </div>
                     </div>
                     <table class="table table-sm">
-                        <tr><td>📊 Total registros</td><td><strong>${{data.total}}</strong></td></tr>
-                        <tr><td>📈 Media de humedad</td><td><strong>${{data.media}}%</strong></td></tr>
-                        <tr><td>📉 Mediana</td><td><strong>${{data.mediana}}%</strong></td></tr>
-                        <tr><td>📊 Desviación estándar</td><td><strong>${{data.desviacion}}%</strong></td></tr>
-                        <tr><td>🔻 Mínimo</td><td><strong>${{data.minimo}}%</strong></td></tr>
-                        <tr><td>🔺 Máximo</td><td><strong>${{data.maximo}}%</strong></td></tr>
+                        <tr><td> Total registros</td><td><strong>${{data.total}}</strong></td></tr>
+                        <tr><td> Media de humedad</td><td><strong>${{data.media}}%</strong></td></tr>
+                        <tr><td> Mediana</td><td><strong>${{data.mediana}}%</strong></td></tr>
+                        <tr><td> Desviación estándar</td><td><strong>${{data.desviacion}}%</strong></td></tr>
+                        <tr><td> Mínimo</td><td><strong>${{data.minimo}}%</strong></td></tr>
+                        <tr><td> Máximo</td><td><strong>${{data.maximo}}%</strong></td></tr>
                     </table>
                 `;
                 document.getElementById('estadisticas-container').innerHTML = html;
@@ -607,20 +607,20 @@ def generar_html(context):
                 }
                 
                 const colorDecision = data.decision === 'regar' ? '#28a745' : '#dc3545';
-                const iconoDecision = data.decision === 'regar' ? '🌊' : '✅';
+                const iconoDecision = data.decision === 'regar' ? '' : '';
                 
                 const html = `
                     <div style="text-align: center;">
                         <div style="font-size: 0.9em; margin-bottom: 15px; color: #666;">
-                            📍 Basado en ${{data.base_datos}} registros recientes
+                             Basado en ${{data.base_datos}} registros recientes
                         </div>
                         <div style="display: flex; justify-content: space-around; margin-bottom: 20px;">
                             <div>
-                                <div>💧 Humedad estimada</div>
+                                <div> Humedad estimada</div>
                                 <div style="font-size: 2em; font-weight: bold;">${{data.humedad_estimada}}%</div>
                             </div>
                             <div>
-                                <div>🌡️ Temperatura</div>
+                                <div> Temperatura</div>
                                 <div style="font-size: 2em; font-weight: bold;">${{data.temperatura_estimada}}°C</div>
                             </div>
                         </div>
@@ -630,7 +630,7 @@ def generar_html(context):
                             </div>
                         </div>
                         <div style="margin-top: 15px;">
-                            <div style="font-size: 0.9em; margin-bottom: 5px;">🎯 Probabilidad de la predicción</div>
+                            <div style="font-size: 0.9em; margin-bottom: 5px;"> Probabilidad de la predicción</div>
                             <div style="position: relative; height: 30px; background: #e9ecef; border-radius: 15px; margin: 10px 0;">
                                 <div style="position: absolute; width: ${{data.probabilidad}}%; background: ${{colorDecision}}; height: 30px; border-radius: 15px; text-align: center; color: white; line-height: 30px;">
                                     ${{data.probabilidad}}%
@@ -655,16 +655,16 @@ def generar_html(context):
                 const data = await response.json();
                 const mensajeDiv = document.getElementById('mensajeRiego');
                 if (data.status === 'success') {{
-                    mensajeDiv.innerHTML = '<div class="alert alert-success">✅ Riego activado correctamente</div>';
+                    mensajeDiv.innerHTML = '<div class="alert alert-success"> Riego activado correctamente</div>';
                     hablar("Riego manual activado. El sistema está regando el cultivo.");
                     setTimeout(() => location.reload(), 3000);
                 }} else {{
-                    mensajeDiv.innerHTML = '<div class="alert alert-danger">❌ Error al activar el riego</div>';
+                    mensajeDiv.innerHTML = '<div class="alert alert-danger"> Error al activar el riego</div>';
                     hablar("Error al activar el riego manual.");
                 }}
             }} catch (error) {{
                 console.error('Error:', error);
-                document.getElementById('mensajeRiego').innerHTML = '<div class="alert alert-danger">❌ Error de conexión</div>';
+                document.getElementById('mensajeRiego').innerHTML = '<div class="alert alert-danger"> Error de conexión</div>';
                 hablar("Error de conexión con el servidor.");
             }}
         }}
@@ -679,7 +679,7 @@ def generar_html(context):
             cargarPrediccionManana();
             
             setTimeout(() => {{
-                console.log("🎤 Iniciando asistente de voz...");
+                console.log(" Iniciando asistente de voz...");
                 hablarDecision("{decision_js}", {humedad_js});
                 alertaCritica({humedad_js});
             }}, 2000);
@@ -850,7 +850,7 @@ async def api_prediccion_manana():
 @app.get("/", response_class=HTMLResponse)
 async def dashboard(request: Request):
     try:
-        print("🟢 Iniciando dashboard...")
+        print(" Iniciando dashboard...")
         bd = GestorBD()
         ia = ModeloRiego()
         ia.cargar_o_crear()
@@ -881,9 +881,9 @@ async def dashboard(request: Request):
                         "temperatura": reg.get('temperatura', 'N/A'),
                         "decision": reg.get('decision', 'N/A')
                     })
-                print(f"📊 Historial cargado: {len(historial)} registros")
+                print(f" Historial cargado: {len(historial)} registros")
         except Exception as e:
-            print(f"⚠️ Error cargando historial: {e}")
+            print(f" Error cargando historial: {e}")
             historial = []
 
         context = {
@@ -900,7 +900,7 @@ async def dashboard(request: Request):
         return HTMLResponse(content=html_content)
         
     except Exception as e:
-        print(f"❌ Error general: {e}")
+        print(f" Error general: {e}")
         import traceback
         traceback.print_exc()
         return HTMLResponse(content=f"<html><body><h1>Error</h1><p>{str(e)}</p></body></html>", status_code=500)
@@ -919,16 +919,16 @@ async def activar_riego_manual():
                 "tipo": "manual"
             }
             bd.db['registros'].insert_one(registro)
-            print("✅ Riego manual registrado")
+            print(" Riego manual registrado")
         return {"status": "success"}
     except Exception as e:
-        print(f"❌ Error en riego manual: {e}")
+        print(f" Error en riego manual: {e}")
         return {"status": "error"}
 
 
 if __name__ == "__main__":
-    print("🚀 AgroVoice Pro Web → http://localhost:8000")
-    print("🔊 Sistema de voz integrado")
-    print("📊 4 gráficas profesionales activas")
-    print("📈 Sección de estadísticas y predicción agregada")
+    print(" AgroVoice Pro Web → http://localhost:8000")
+    print(" Sistema de voz integrado")
+    print(" 4 gráficas profesionales activas")
+    print(" Sección de estadísticas y predicción agregada")
     uvicorn.run("app_web:app", host="0.0.0.0", port=8000, reload=True)
