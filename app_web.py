@@ -543,7 +543,7 @@ def generar_html(context):
             }} catch(e) {{ console.error("Error gráfica riegos:", e); }}
         }}
         
-        // ========== ESTADÍSTICAS DE DATOS ==========
+               // ========== ESTADÍSTICAS DE DATOS ==========
         async function cargarEstadisticas() {
             try {
                 const response = await fetch('/api/estadisticas-datos');
@@ -564,25 +564,25 @@ def generar_html(context):
                 const html = `
                     <div style="margin-bottom: 15px;">
                         <div style="background: #e9ecef; border-radius: 10px; margin-bottom: 8px;">
-                            <div style="background: #28a745; width: ${p25_35}%; border-radius: 10px; padding: 5px; color: white;">25-35%: ${p25_35}%</div>
+                            <div style="background: #28a745; width: ${{p25_35}}%; border-radius: 10px; padding: 5px; color: white;">25-35%: ${{p25_35}}%</div>
                         </div>
                         <div style="background: #e9ecef; border-radius: 10px; margin-bottom: 8px;">
-                            <div style="background: #17a2b8; width: ${p35_45}%; border-radius: 10px; padding: 5px; color: white;">35-45%: ${p35_45}%</div>
+                            <div style="background: #17a2b8; width: ${{p35_45}}%; border-radius: 10px; padding: 5px; color: white;">35-45%: ${{p35_45}}%</div>
                         </div>
                         <div style="background: #e9ecef; border-radius: 10px; margin-bottom: 8px;">
-                            <div style="background: #ffc107; width: ${p45_55}%; border-radius: 10px; padding: 5px; color: #333;">45-55%: ${p45_55}%</div>
+                            <div style="background: #ffc107; width: ${{p45_55}}%; border-radius: 10px; padding: 5px; color: #333;">45-55%: ${{p45_55}}%</div>
                         </div>
                         <div style="background: #e9ecef; border-radius: 10px; margin-bottom: 8px;">
-                            <div style="background: #dc3545; width: ${p55_65}%; border-radius: 10px; padding: 5px; color: white;">55-65%: ${p55_65}%</div>
+                            <div style="background: #dc3545; width: ${{p55_65}}%; border-radius: 10px; padding: 5px; color: white;">55-65%: ${{p55_65}}%</div>
                         </div>
                     </div>
                     <table class="table table-sm">
-                        <tr><td>📊 Total registros</td><td><strong>${data.total}</strong></td></tr>
-                        <tr><td>📈 Media de humedad</td><td><strong>${data.media}%</strong></td></tr>
-                        <tr><td>📉 Mediana</td><td><strong>${data.mediana}%</strong></td></tr>
-                        <tr><td>📊 Desviación estándar</td><td><strong>${data.desviacion}%</strong></td></tr>
-                        <tr><td>🔻 Mínimo</td><td><strong>${data.minimo}%</strong></td></tr>
-                        <tr><td>🔺 Máximo</td><td><strong>${data.maximo}%</strong></td></tr>
+                        <tr><td>📊 Total registros</td><td><strong>${{data.total}}</strong></td></tr>
+                        <tr><td>📈 Media de humedad</td><td><strong>${{data.media}}%</strong></td></tr>
+                        <tr><td>📉 Mediana</td><td><strong>${{data.mediana}}%</strong></td></tr>
+                        <tr><td>📊 Desviación estándar</td><td><strong>${{data.desviacion}}%</strong></td></tr>
+                        <tr><td>🔻 Mínimo</td><td><strong>${{data.minimo}}%</strong></td></tr>
+                        <tr><td>🔺 Máximo</td><td><strong>${{data.maximo}}%</strong></td></tr>
                     </table>
                 `;
                 document.getElementById('estadisticas-container').innerHTML = html;
@@ -593,17 +593,18 @@ def generar_html(context):
             }
         }
         
+      
         // ========== PREDICCIÓN PARA MAÑANA ==========
-        async function cargarPrediccionManana() {{
-            try {{
+        async function cargarPrediccionManana() {
+            try {
                 const response = await fetch('/api/prediccion-manana');
                 const data = await response.json();
                 
-                if (data.error) {{
+                if (data.error) {
                     document.getElementById('prediccion-container').innerHTML = 
                         '<div class="alert alert-warning">No hay datos suficientes para predicción</div>';
                     return;
-                }}
+                }
                 
                 const colorDecision = data.decision === 'regar' ? '#28a745' : '#dc3545';
                 const iconoDecision = data.decision === 'regar' ? '🌊' : '✅';
@@ -611,28 +612,28 @@ def generar_html(context):
                 const html = `
                     <div style="text-align: center;">
                         <div style="font-size: 0.9em; margin-bottom: 15px; color: #666;">
-                            📍 Basado en ${data.base_datos} registros recientes
+                            📍 Basado en ${{data.base_datos}} registros recientes
                         </div>
                         <div style="display: flex; justify-content: space-around; margin-bottom: 20px;">
                             <div>
                                 <div>💧 Humedad estimada</div>
-                                <div style="font-size: 2em; font-weight: bold;">${data.humedad_estimada}%</div>
+                                <div style="font-size: 2em; font-weight: bold;">${{data.humedad_estimada}}%</div>
                             </div>
                             <div>
                                 <div>🌡️ Temperatura</div>
-                                <div style="font-size: 2em; font-weight: bold;">${data.temperatura_estimada}°C</div>
+                                <div style="font-size: 2em; font-weight: bold;">${{data.temperatura_estimada}}°C</div>
                             </div>
                         </div>
-                        <div style="background: ${colorDecision}; border-radius: 15px; padding: 15px; margin: 15px 0;">
+                        <div style="background: ${{colorDecision}}; border-radius: 15px; padding: 15px; margin: 15px 0;">
                             <div style="font-size: 1.5em; font-weight: bold; color: white;">
-                                ${iconoDecision} ${data.decision.toUpperCase()}
+                                ${{iconoDecision}} ${{data.decision.toUpperCase()}}
                             </div>
                         </div>
                         <div style="margin-top: 15px;">
                             <div style="font-size: 0.9em; margin-bottom: 5px;">🎯 Probabilidad de la predicción</div>
                             <div style="position: relative; height: 30px; background: #e9ecef; border-radius: 15px; margin: 10px 0;">
-                                <div style="position: absolute; width: ${data.probabilidad}%; background: ${colorDecision}; height: 30px; border-radius: 15px; text-align: center; color: white; line-height: 30px;">
-                                    ${data.probabilidad}%
+                                <div style="position: absolute; width: ${{data.probabilidad}}%; background: ${{colorDecision}}; height: 30px; border-radius: 15px; text-align: center; color: white; line-height: 30px;">
+                                    ${{data.probabilidad}}%
                                 </div>
                             </div>
                             <small class="text-muted">Basado en tendencia histórica de 30 días</small>
@@ -640,11 +641,13 @@ def generar_html(context):
                     </div>
                 `;
                 document.getElementById('prediccion-container').innerHTML = html;
-            }} catch(e) {{
+            } catch(e) {
                 console.error("Error cargando prediccion:", e);
-            }}
-        }}
-        
+            }
+        }
+
+
+      
         // ========== RIEGO MANUAL CON VOZ ==========
         async function activarRiegoManual() {{
             try {{
