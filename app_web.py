@@ -544,16 +544,16 @@ def generar_html(context):
         }}
         
         // ========== ESTADÍSTICAS DE DATOS ==========
-        async function cargarEstadisticas() {{
-            try {{
+        async function cargarEstadisticas() {
+            try {
                 const response = await fetch('/api/estadisticas-datos');
                 const data = await response.json();
                 
-                if (data.error) {{
+                if (data.error) {
                     document.getElementById('estadisticas-container').innerHTML = 
                         '<div class="alert alert-warning">No hay datos disponibles</div>';
                     return;
-                }}
+                }
                 
                 const total = data.total;
                 const p25_35 = ((data.rango_25_35 / total) * 100).toFixed(1);
@@ -586,10 +586,12 @@ def generar_html(context):
                     </table>
                 `;
                 document.getElementById('estadisticas-container').innerHTML = html;
-            }} catch(e) {{
+            } catch(e) {
                 console.error("Error cargando estadisticas:", e);
-            }}
-        }}
+                document.getElementById('estadisticas-container').innerHTML = 
+                    '<div class="alert alert-danger">Error cargando estadísticas</div>';
+            }
+        }
         
         // ========== PREDICCIÓN PARA MAÑANA ==========
         async function cargarPrediccionManana() {{
