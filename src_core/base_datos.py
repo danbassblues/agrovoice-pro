@@ -1,20 +1,20 @@
 from pymongo import MongoClient
 from datetime import datetime
-import config
+
+# Cadena de conexión a MongoDB Atlas
+ATLAS_URI = "mongodb+srv://agrovoice_user:AgroVoice2026@cluster0.iuul628.mongodb.net/?appName=Cluster0"
 
 class GestorBD:
     def __init__(self):
         try:
-            # Usar MONGO_URI desde config.py
-            self.client = MongoClient(config.MONGO_URI)
-            self.db = self.client[config.MONGO_DB_NAME]
-            print("✅ Conexión a MongoDB establecida")
+            self.client = MongoClient(ATLAS_URI)
+            self.db = self.client['agrovoice']
+            print("✅ Conexión a MongoDB Atlas establecida")
         except Exception as e:
-            print(f"❌ Error conectando a MongoDB: {e}")
+            print(f"❌ Error conectando a Atlas: {e}")
             raise
     
     def obtener_ultimos_registros(self, limit=12):
-        """Obtiene los últimos registros de riego"""
         try:
             registros = list(self.db['registros']
                            .find({})
@@ -26,7 +26,6 @@ class GestorBD:
             return []
     
     def guardar_registro_riego(self, humedad_suelo, temperatura, decision):
-        """Guarda un registro de riego"""
         try:
             registro = {
                 "fecha": datetime.now(),
@@ -36,17 +35,17 @@ class GestorBD:
                 "tipo": "automatico"
             }
             self.db['registros'].insert_one(registro)
-            print(f"✅ Registro guardado: {decision}")
+            print(f"✅ Registro guardado: {decision} - Humedad: {humedad_suelo}%")
             return True
         except Exception as e:
             print(f"Error guardando registro: {e}")
             return False
     
-    def obtener_sensores(self, limit=1000):
-        """Obtiene datos históricos de sensores"""
+    def obtener_sensores(self, limit=100):
         try:
             sensores = list(self.db['sensores']
                           .find({})
+                          .sort('fecha', -1)
                           .limit(limit))
             return sensores
         except Exception as e:
@@ -54,7 +53,6 @@ class GestorBD:
             return []
     
     def guardar_clima_api(self, datos_clima):
-        """Guarda los datos del clima obtenidos de la API"""
         try:
             datos_clima['fecha'] = datetime.now()
             self.db['clima_real'].insert_one(datos_clima)
