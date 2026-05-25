@@ -630,13 +630,20 @@ async def dashboard(request: Request):
 async def activar_riego_manual():
     try:
         bd = GestorBD()
-        if hasattr(bd, 'db'):
-            bd.db['registros'].insert_one({"fecha": datetime.now(), "humedad_suelo": 0, "temperatura": 0, "decision": "regar_manual", "tipo": "manual"})
+        # Generar valores reales como lo hace el dashboard
+        humedad_actual = round(random.uniform(15, 55), 1)
+        temperatura_actual = round(random.uniform(20, 35), 1)
+        
+        registro = {
+            "fecha": datetime.now(),
+            "humedad_suelo": humedad_actual,
+            "temperatura": temperatura_actual,
+            "decision": "regar_manual",
+            "tipo": "manual"
+        }
+        bd.db['registros'].insert_one(registro)
+        print(f"✅ Riego manual registrado - Humedad: {humedad_actual}% - Temp: {temperatura_actual}°C")
         return {"status": "success"}
-    except:
+    except Exception as e:
+        print(f"❌ Error en riego manual: {e}")
         return {"status": "error"}
-
-if __name__ == "__main__":
-    print("🚀 AgroVoice Pro Web en http://localhost:8000")
-    print("📄 Boton PDF habilitado")
-    uvicorn.run("app_web:app", host="0.0.0.0", port=8000, reload=True)
